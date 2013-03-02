@@ -1,6 +1,8 @@
--module(sql_tools).
+-module(sql_utils).
+
 -export([encode/1,encode/2,escape/1,escape_like/1]).
 -export([quote/1,quote/2]).
+
 -export([encode_select/1]).
 -export([encode_insert/2,encode_insert/3]).
 -export([encode_update/2,encode_update/3]).
@@ -221,16 +223,16 @@ quote(Bin) when is_binary(Bin) ->
     quote(Bin,utf8).
 
 quote(Bin, latin1) when is_binary(Bin) ->
-	list_to_binary(quote(binary_to_list(Bin)));
+    list_to_binary(quote(binary_to_list(Bin)));
 
 quote(Bin, Encoding) when is_binary(Bin) ->
-	case unicode:characters_to_list(Bin,Encoding) of
-		{error,E1,E2} -> 
-			exit({invalid_encoding_binary, E1, E2});
-		{incomplete,E1,E2} ->
-			exit({invalid_encoding_binary, E1, E2});
-	    List ->
-			unicode:characters_to_binary(quote(List),Encoding,Encoding)    	
+    case unicode:characters_to_list(Bin,Encoding) of
+	{error,E1,E2} -> 
+	    exit({invalid_encoding_binary, E1, E2});
+	{incomplete,E1,E2} ->
+	    exit({invalid_encoding_binary, E1, E2});
+	List ->
+	    unicode:characters_to_binary(quote(List),Encoding,Encoding)    	
     end.
 
 quote_loop(List) ->
