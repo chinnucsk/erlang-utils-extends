@@ -11,4 +11,8 @@ deps
 *.beam
 \#*\#
 *.app
-rel/cerberus
+.eunit
+deps
+*.o
+*.beam
+*.plt
