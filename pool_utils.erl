@@ -16,6 +16,5 @@ call(Pool, Msg, Timeout) ->
 
 cast(Pool,Msg)->
     Worker = poolboy:checkout(Pool),
-    Reply = gen_server:cast(Worker,Msg),
-    poolboy:checkin(Pool,Worker),
-    Reply.
+    gen_server:cast(Worker,Msg),
+    poolboy:checkin(Pool,Worker).
