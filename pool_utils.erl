@@ -21,7 +21,7 @@ cast(Pool,Msg,checkin)->
     Worker = poolboy:checkout(Pool),
     gen_server:cast(Worker,Msg),
     poolboy:checkin(Pool,Worker);
-cast(Pool,Msg,not_chekin) ->
+cast(Pool,Msg,not_checkin) ->
     Worker = poolboy:checkout(Pool),
     gen_server:cast(Worker,Msg);
 cast(Pool,Msg,_) ->
