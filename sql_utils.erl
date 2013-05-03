@@ -106,6 +106,9 @@ encode_where({'in', Field, Values}) ->
 	InStr = string:join([encode(Value) || Value <- Values], ","),
 	atom_to_list(Field) ++ " IN (" ++ InStr ++ ")";
 
+encode_where({'<>',Field,Values})->
+	atom_to_list(Field) ++ " <> " ++ encode(Value);
+
 encode_where({Field, Value}) ->
 	atom_to_list(Field) ++ " = " ++ encode(Value).
 
