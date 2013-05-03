@@ -1,6 +1,6 @@
 -module(pool_utils).
--export([call/2, call/3]).
--export([cast/2]).
+-export([call/2,call/3]).
+-export([cast/2,cast/3]).
 
 call(Pool, Msg) ->
     Worker = poolboy:checkout(Pool),
@@ -15,6 +15,17 @@ call(Pool, Msg, Timeout) ->
     Reply.
 
 cast(Pool,Msg)->
+    cast(Pool,Msg,checkin).
+
+cast(Pool,Msg,checkin)->
     Worker = poolboy:checkout(Pool),
     gen_server:cast(Worker,Msg),
-    poolboy:checkin(Pool,Worker).
+    poolboy:checkin(Pool,Worker);
+cast(Pool,Msg,not_checkin) ->
+    Worker = poolboy:checkout(Pool),
+    gen_server:cast(Worker,Msg);
+cast(Pool,Msg,_) ->
+    erlang:error(badarg).
+
+
+    
