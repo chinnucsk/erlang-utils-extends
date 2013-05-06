@@ -1,4 +1,4 @@
--module(sql_sdl).
+-module(sql_dsl).
 -export([sql/1, sql/2, unsafe_sql/1, unsafe_sql/2]).
 
 %% @doc Generate an iolist (a tree of strings and/or binaries)
