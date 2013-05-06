@@ -26,7 +26,7 @@ encode_select({Tab, Fields, Where}) when is_atom(Tab)
 
 
 encode_insert(Tab, Record) ->
-	{Fields, Values} = lists:unzip([{atom_to_list(F), sql_encode:encode(V)} 
+	{Fields, Values} = lists:unzip([{atom_to_list(F), sql_encode:encode(V,list)} 
 		|| {F, V} <- Record]),
 	List = ["INSERT INTO ", atom_to_list(Tab), " (",
 		 string:join(Fields, ","), ") VALUES (",
@@ -76,7 +76,7 @@ encode_fields(Fields) ->
     string:join([atom_to_list(F) || F <- Fields], " ,").
 
 encode_column({F, V}) when is_atom(F) ->
-	lists:concat([atom_to_list(F), "=", sql_encode:encode(V)]).
+	lists:concat([atom_to_list(F), "=", sql_encode:encode(V,list)]).
 
 encode_where({'and', L, R}) ->
 	encode_where(L) ++ " AND " ++ encode_where(R);
@@ -91,23 +91,23 @@ encode_where({'or', List}) when is_list(List) ->
 	string:join([encode_where(E) || E <- List], " OR ");
 
 encode_where({like, Field, Value}) ->	
-	atom_to_list(Field) ++ " LIKE " ++ sql_encode:encode(Value);
+	atom_to_list(Field) ++ " LIKE " ++ sql_encode:encode(Value,list);
 
 encode_where({'<', Field, Value}) ->	
-	atom_to_list(Field) ++ " < " ++ sql_encode:encode(Value);
+	atom_to_list(Field) ++ " < " ++ sql_encode:encode(Value,list);
 
 encode_where({'>', Field, Value}) ->	
-	atom_to_list(Field) ++ " > " ++ sql_encode:encode(Value);
+	atom_to_list(Field) ++ " > " ++ sql_encode:encode(Value,list);
 
 encode_where({'in', Field, Values}) ->	
-	InStr = string:join([sql_encode:encode(Value) || Value <- Values], ","),
+	InStr = string:join([sql_encode:encode(Value,list) || Value <- Values], ","),
 	atom_to_list(Field) ++ " IN (" ++ InStr ++ ")";
 
 encode_where({'<>',Field,Value})->
-	atom_to_list(Field) ++ " <> " ++ sql_encode:encode(Value);
+	atom_to_list(Field) ++ " <> " ++ sql_encode:encode(Value,list);
 
 encode_where({Field, Value}) ->
-	atom_to_list(Field) ++ " = " ++ sql_encode:encode(Value).
+	atom_to_list(Field) ++ " = " ++ sql_encode:encode(Value,list).
 
 
 

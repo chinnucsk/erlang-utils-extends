@@ -1,9 +1,9 @@
 -module(sql_encode).
--export([encode/1,encode/2]).
+-export([encode/1,encode/2,encode/3]).
 -export([quote/1,quote/2]).
 
 encode(Val) ->
-    encode(Val, list).
+    encode(Val,binary).
 
 encode(Val, ReturnType) when is_atom(Val)->
 	encode(atom_to_list(Val), ReturnType, latin1);
@@ -18,7 +18,9 @@ encode(null, binary, _)->
 	<<"NULL">>;
 encode(undefined, binary, _)->
 	<<"NULL">>;
-
+encode(Val,list,Encoding) when is_atom(Val)->
+	Bin = erlang:atom_to_binary(Val,Encoding),
+	erlang:binary_to_list(Bin);
 encode(Val, list, latin1) when is_binary(Val) ->
 	quote(binary_to_list(Val));
 encode(Val, list, Encoding) when is_binary(Val) ->
@@ -31,6 +33,8 @@ encode(Val, list, _) when is_float(Val) ->
 	[Res] = io_lib:format("~w", [Val]),
 	Res;
 
+encode(Val,list,Encoding) when is_atom(Val)->
+	erlang:atom_to_binary(Val,Encoding);
 encode(Val, binary, latin1) when is_binary(Val) ->
 	quote(Val, latin1);
 encode(Val, binary, Encoding) when is_binary(Val) ->
