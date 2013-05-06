@@ -31,37 +31,52 @@ encode(Val, list, _) when is_float(Val) ->
 	[Res] = io_lib:format("~w", [Val]),
 	Res;
 
-encode(Val, binary, latin1) when is_list(Val) -> 
-	list_to_binary(quote(Val));
-encode(Val, binary, Encoding) when is_list(Val) ->
-	unicode:characters_to_binary(quote(Val), Encoding, Encoding);
 encode(Val, binary, latin1) when is_binary(Val) ->
 	quote(Val, latin1);
 encode(Val, binary, Encoding) when is_binary(Val) ->
 	quote(Val, Encoding);
+encode(Val, binary, latin1) when is_list(Val) -> 
+	list_to_binary(quote(Val));
+encode(Val, binary, Encoding) when is_list(Val) ->
+	unicode:characters_to_binary(quote(Val), Encoding, Encoding);
 encode(Val, binary, _) when is_integer(Val) ->
 	list_to_binary(integer_to_list(Val));
 encode(Val, binary, _) when is_float(Val) ->
 	[Res] = io_lib:format("~w", [Val]),
 	erlang:list_to_binary(Res);
 
-encode({datetime, Val}, AsBinary) ->
-    encode(Val, AsBinary);
-encode({{Year,Month,Day}, {Hour,Minute,Second}}, false) ->
-    [Year1,Month1,Day1,Hour1,Minute1,Second1] =
-        lists:map(fun two_digits/1,[Year, Month, Day, Hour, Minute,Second]),
-    lists:flatten(io_lib:format("'~s-~s-~s ~s:~s:~s'",
-        [Year1,Month1,Day1,Hour1,Minute1,Second1]));
-encode({date, {Year, Month, Day}}, false) ->
-    [Year1,Month1,Day1] =
-        lists:map(fun two_digits/1,[Year, Month, Day]),
+encode({datetime, Val}, list,Encoding) ->
+    encode(Val,list,Encoding);
+encode({{Year,Month,Day}, {Hour,Minute,Second}}, list,_) ->
+    [Year1,Month1,Day1,Hour1,Minute1,Second1] = lists:map(fun two_digits/1,[Year, Month, Day, Hour, Minute,Second]),
+    lists:flatten(io_lib:format("'~s-~s-~s ~s:~s:~s'",[Year1,Month1,Day1,Hour1,Minute1,Second1]));
+encode({date, {Year, Month, Day}},list,_) ->
+    [Year1,Month1,Day1] = lists:map(fun two_digits/1,[Year, Month, Day]),
     lists:flatten(io_lib:format("'~s-~s-~s'",[Year1,Month1,Day1]));
-encode({time, {Hour, Minute, Second}}, false) ->
+encode({time, {Hour, Minute, Second}},list,_) ->
     [Hour1,Minute1,Second1] =
         lists:map(fun two_digits/1,[Hour, Minute, Second]),
     lists:flatten(io_lib:format("'~s:~s:~s'",[Hour1,Minute1,Second1]));
-encode(Val, _AsBinary) ->
+
+encode({datetime,Val},binary,Encoding)->
+	erlang:list_to_binary(encode(Val,list,Encoding));
+encode({date,Val},binary,Encoding)->
+	erlang:list_to_binary(encode({date,Val},list,Encoding));
+encode({time,Val},binary,Encoding)->
+	erlang:list_to_binary(encode({time,Val},list,Encoding));
+
+encode(Val, _,_) ->
     {error, {unrecognized_value, {Val}}}.
+
+two_digits(Nums) when is_list(Nums) ->
+    [two_digits(Num) || Num <- Nums];
+two_digits(Num) ->
+    [Str] = io_lib:format("~b", [Num]),
+    case length(Str) of
+		1 -> [$0 | Str];
+		_ -> Str
+    end.
+
 
 quote(String) when is_list(String) ->
     [$' | lists:reverse([$' | quote_loop(String)])];
