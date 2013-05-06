@@ -24,7 +24,7 @@ cast(Pool,Msg,checkin)->
 cast(Pool,Msg,not_checkin) ->
     Worker = poolboy:checkout(Pool),
     gen_server:cast(Worker,Msg);
-cast(Pool,Msg,_) ->
+cast(_Pool,_Msg,_) ->
     erlang:error(badarg).
 
 
