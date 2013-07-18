@@ -36,7 +36,14 @@
 %% @end
 %%--------------------------------------------------------------------
 start_link(Options) ->
-	gen_server:start_link(?MODULE, Options, []).
+	Name = proplists:get_value(name,Options),
+	Conf = proplists:get_value(conf,Options),
+	case Name of
+		undefined->
+			gen_server:start_link(?MODULE, Conf, []);
+		_->
+			gen_server:start_link({local,Name},?MODULE,Conf,[])
+	end.
 
 %%%===================================================================
 %%% gen_server callbacks
@@ -294,6 +301,7 @@ command_exists({Prefix,Key},#state{redis_client = RedisClient})->
 	Result = eredis:q(RedisClient,["EXISTS",CacheKey]),
 	lager:log(debug,redis_cache_worker,"EXISTS:~p Result:~p~n",[CacheKey,Result]),
 	Result.
+
 command_sadd({Prefix,Key,Item},#state{redis_client = RedisClient})->
 	CacheKey = get_cache_key(Prefix,Key),
 	Result = eredis:q(RedisClient,["SADD",CacheKey,Item]),
