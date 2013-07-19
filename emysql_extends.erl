@@ -27,13 +27,13 @@ add_dbs_to_pool([H|T])->
 
 execute({pool,Pool},SQL,Fun)->
     SQLBin = hm_converter:term_to_iolist(SQL),
-    lager:log(info,"SQL:~p without transaction~n",[SQLBin]),
+    lager:log(info,sql,"SQL:~p without transaction~n",[SQLBin]),
     Packet = emysql:execute(Pool,SQLBin),
     Fun(Packet);
 
 execute({conn,Connection},SQL,Fun)->
     SQLBin = hm_converter:term_to_iolist(SQL),
-    lager:log(info,"SQL:~p with transaction~n",[SQLBin]),
+    lager:log(info,sql,"SQL:~p with transaction~n",[SQLBin]),
     Packet = emysql_conn:execute(Connection,SQLBin,[]),
     Fun(Packet).
 
