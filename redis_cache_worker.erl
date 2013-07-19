@@ -87,6 +87,9 @@ init(Options) ->
 %%                                   {stop, Reason, State}
 %% @end
 %%-------------------------------------------------------------------
+handle_call({smove,Prefix,Key1,Key2,Item},_From,State)->
+	Reply = command_smove({Prefix,Key1,Key2,Item}，State),
+	{reply,Reply,State};
 handle_call({sismember,Prefix,Key,Item},_From,State)->
 	Reply = command_sismember({Prefix,Key,Item}),
 	{reply,Reply,State};
@@ -321,4 +324,10 @@ command_sismember({Prefix,Key,Item},#state{redis_client = RedisClient})->
 	CacheKey = get_cache_key(Prefix,Key),
 	Result = eredis:q(RedisClient,["SISMEMBER",CacheKey,Item]),
 	lager:log(debug,redis_cache_worker,"SISMEMBER:~p Result:~p~n",[CacheKey,Result]),
+	Result.
+command_smove({Prefix,Key1,Key2,Item},#state{redis_client = RedisClient})->
+	CacheKey1 = get_cache_key(Prefix,Key1),
+	CacheKey2 = get_cache_key(Prefix,Key2),
+	Result = eredis:q(RedisClient,["SMOVE",CacheKey1,CacheKey2,Item]),
+	lager:log(debug,redis_cache_worker,"SMOVE:(~p,~p) Result:~p~n",[CacheKey1,CacheKey2,Result]),
 	Result.
