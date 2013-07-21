@@ -14,8 +14,7 @@
 -export([start_link/1]).
 
 %% gen_server callbacks
--export([init/1, handle_call/3, handle_cast/2, handle_info/2,
-		 terminate/2, code_change/3]).
+-export([init/1, handle_call/3, handle_cast/2, handle_info/2,terminate/2, code_change/3]).
 
 -define(SERVER, ?MODULE). 
 
@@ -88,19 +87,19 @@ init(Options) ->
 %% @end
 %%-------------------------------------------------------------------
 handle_call({smove,Prefix,Key1,Key2,Item},_From,State)->
-	Reply = command_smove({Prefix,Key1,Key2,Item}，State),
+	Reply = command_smove({Prefix,Key1,Key2,Item},State),
 	{reply,Reply,State};
 handle_call({sismember,Prefix,Key,Item},_From,State)->
-	Reply = command_sismember({Prefix,Key,Item}),
+	Reply = command_sismember({Prefix,Key,Item},State),
 	{reply,Reply,State};
 handle_call({spop,Prefix,Key},_From,State)->
-	Reply = command_spop({Prefix,Key,Item},State),
+	Reply = command_spop({Prefix,Key},State),
 	{reply,Reply,State};
 handle_call({sadd,Prefix,Key,Item},_From,State)->
-	Reply = command_sadd({Prefix,Key,Item},Satet),
+	Reply = command_sadd({Prefix,Key,Item},State),
 	{reply,Reply,State};
 handle_call({srem,Prefix,Key,Item},_From,State)->
-	Reply = command_srem({Prefix,Key,Item},Satet),
+	Reply = command_srem({Prefix,Key,Item},State),
 	{reply,Reply,State};
 handle_call({set,Prefix,Key,Val},_From,State)->
 	Reply = command_set({Prefix,Key,Val},State),
